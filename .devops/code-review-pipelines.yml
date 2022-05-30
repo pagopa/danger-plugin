@@ -24,9 +24,9 @@ resources:
   repositories:
     - repository: pagopaCommons
       type: github
-      name: pagopa/azure-pipeline-templates
+      name: grausof/azure-pipeline-templates
       ref: refs/tags/v8
-      endpoint: "pagopa"
+      endpoint: "grausof"
 
 stages:
   - stage: Build
