@@ -1,40 +1,44 @@
-import * as IO from "io-ts";
+/**
+ * type definition for Jira tickets / stories
+ */
 
-export const JiraIssueTypeName = IO.union([
-  IO.literal("Story"),
-  IO.literal("Epic"),
-  IO.literal("Bug"),
-  IO.literal("Sottotask"),
-  IO.literal("Sub-task"),
-  IO.literal("Task"),
-]);
+import * as t from "io-ts";
 
-export type JiraIssueTypeName = IO.TypeOf<typeof JiraIssueTypeName>;
-
-const IssueType = IO.interface({
-  name: JiraIssueTypeName,
-  subtask: IO.boolean,
+export const JiraIssueTypeName = t.keyof({
+  Story: null,
+  Epic: null,
+  Bug: null,
+  Sottotask: null,
+  "Sub-task": null,
+  Task: null,
 });
 
-export const JiraIssueResponse = IO.exact(
-  IO.interface({
-    key: IO.string,
-    fields: IO.intersection([
-      IO.interface({
-        summary: IO.string,
+export type JiraIssueTypeName = t.TypeOf<typeof JiraIssueTypeName>;
+
+const IssueType = t.interface({
+  name: JiraIssueTypeName,
+  subtask: t.boolean,
+});
+
+export const JiraIssueResponse = t.exact(
+  t.interface({
+    key: t.string,
+    fields: t.intersection([
+      t.interface({
+        summary: t.string,
         issuetype: IssueType,
-        labels: IO.array(IO.string),
-        project: IO.interface({
-          name: IO.string,
-          key: IO.string,
-          id: IO.string,
+        labels: t.array(t.string),
+        project: t.interface({
+          name: t.string,
+          key: t.string,
+          id: t.string,
         }),
       }),
-      IO.partial({
-        parent: IO.interface({
-          key: IO.string,
-          fields: IO.interface({
-            summary: IO.string,
+      t.partial({
+        parent: t.interface({
+          key: t.string,
+          fields: t.interface({
+            summary: t.string,
             issuetype: IssueType,
           }),
         }),
@@ -42,4 +46,4 @@ export const JiraIssueResponse = IO.exact(
     ]),
   })
 );
-export type JiraIssueResponse = IO.TypeOf<typeof JiraIssueResponse>;
+export type JiraIssueResponse = t.TypeOf<typeof JiraIssueResponse>;

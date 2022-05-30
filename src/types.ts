@@ -1,9 +1,13 @@
-import { jiraHostName } from "./jira";
+/**
+ * type definition for generic tickets / stories and Jira conversion
+ */
+
+import { JIRA_HOST_NAME } from "./jira";
 import { JiraIssueTypeName, JiraIssueResponse } from "./jira/types";
 
 export type GenericTicketType = "feat" | "fix" | "chore" | "epic";
 
-export interface I_GenericTicket {
+export interface GenericTicket {
   readonly id: string;
   // a prefix that should be used to represent the ticket id
   readonly idPrefix?: string;
@@ -14,7 +18,7 @@ export interface I_GenericTicket {
   // the url to reach the ticket
   readonly url: string;
   // is a subtask linked with a father ticket?
-  readonly parent?: I_GenericTicket;
+  readonly parent?: GenericTicket;
 }
 
 /**
@@ -49,7 +53,7 @@ const convertJiraTypeToGeneric = (
  */
 export const fromJiraToGenericTicket = (
   jira: JiraIssueResponse
-): I_GenericTicket => ({
+): GenericTicket => ({
   id: jira.key,
   parent: jira.fields.parent
     ? fromJiraToGenericTicket({
@@ -65,5 +69,5 @@ export const fromJiraToGenericTicket = (
   tags: jira.fields.labels,
   title: jira.fields.summary,
   type: convertJiraTypeToGeneric(jira.fields.issuetype.name),
-  url: new URL(jira.key, `https://${jiraHostName}/browse/`).toString(),
+  url: new URL(jira.key, `https://${JIRA_HOST_NAME}/browse/`).toString(),
 });

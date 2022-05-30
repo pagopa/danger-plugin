@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-// Provides dev-time typing structure for  `danger` - doesn't affect runtime.
-// https://github.com/danger/danger-js/blob/main/docs/usage/extending-danger.html.md#writing-your-plugin
-import { GenericTicketType, I_GenericTicket } from "./types";
+/**
+ * Implements methods for rendering tickets / stories via danger markdown
+ */
+
+import { GenericTicketType, GenericTicket } from "./types";
 export declare function warn(message: string): void;
 export declare function markdown(message: string): void;
 export declare function schedule<T>(asyncFunction: Promise<T>): void;
@@ -13,22 +14,13 @@ const StoryEmoji: Record<GenericTicketType, string> = {
   fix: "🐞",
 };
 
-export const printWarningError = (e: Error): void => {
-  warn(e.message);
-};
-
-/**
- * Comments with the ticket type, id and title
- *
- * @param ticket
- */
-export const renderTicket = (ticket: I_GenericTicket): string =>
+export const renderTicket = (ticket: GenericTicket): string =>
   `${StoryEmoji[ticket.type]} [${ticket.idPrefix ? ticket.idPrefix : ""}${
     ticket.id
   }](${ticket.url}): ${ticket.title}`;
 
 export const renderTickets = (
-  ticketList: ReadonlyArray<I_GenericTicket>
+  ticketList: ReadonlyArray<GenericTicket>
 ): void => {
   const ticketListToString = ticketList
     .map((s) => {

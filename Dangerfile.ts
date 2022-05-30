@@ -1,3 +1,3 @@
-import { checkDangers } from "./src/index";
+import { main } from "./src/index";
 
-checkDangers();
+main();
