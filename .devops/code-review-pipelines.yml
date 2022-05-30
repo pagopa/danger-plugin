@@ -1,0 +1,53 @@
+# Azure DevOps pipeline to build, check source codes and run tests.
+#
+# To make Danger JS and JIRA run on a pull request you need to add the following pipeline
+# variable and set it with a GitHub access token (scope public_repo); otherwise
+# set its value to 'skip' without marking it secret:
+# - DANGER_GITHUB_API_TOKEN
+# - JIRA_USERNAME
+# - JIRA_PASSWORD
+#
+
+variables:
+  NODE_VERSION: "16.15.0"
+  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+
+# Automatically triggered on PR
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
+trigger: none
+
+pool:
+  vmImage: "ubuntu-latest"
+
+
+resources:
+  repositories:
+    - repository: pagopaCommons
+      type: github
+      name: pagopa/azure-pipeline-templates
+      ref: refs/tags/v8
+      endpoint: "pagopa"
+
+stages:
+  - stage: Static_analysis
+    dependsOn: []
+    jobs:
+      - job: danger
+        condition: and(
+          succeeded(),
+          and(
+          eq(variables['Build.Reason'], 'PullRequest'),
+          ne(variables['DANGER_GITHUB_API_TOKEN'], 'skip'),
+          ne(variables['JIRA_USERNAME'], ''),
+          ne(variables['JIRA_PASSWORD'], '')
+          )
+          )
+        steps:
+          - template: templates/node-job-setup/template.yaml@pagopaCommons
+          - bash: |
+              yarn danger ci
+            env:
+              DANGER_GITHUB_API_TOKEN: "$(DANGER_GITHUB_API_TOKEN)"
+              JIRA_USERNAME: "$(JIRA_USERNAME)"
+              JIRA_PASSWORD: "$(JIRA_PASSWORD)"
+            displayName: "Danger CI"

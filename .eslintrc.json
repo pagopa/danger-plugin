@@ -1,0 +1,19 @@
+{
+  "env": {
+    "es2021": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "node_modules",
+    "dist",
+    "**/__tests__/*",
+    "**/__mocks__/*",
+    "Dangerfile.*",
+    "*.d.ts"
+  ],
+  "extends": ["@pagopa/eslint-config/strong"],
+  "rules": {
+    "sort-keys": "off",
+    "@typescript-eslint/naming-convention": "off"
+  }
+}
