@@ -1,5 +1,6 @@
 import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadOnlyArray";
 import { pipe } from "fp-ts/function";
 
@@ -11,6 +12,7 @@ import { renderTickets } from "./dangerRender";
 import { getJiraIssues } from "./jira";
 import { fromJiraToGenericTicket } from "./types";
 import { checkMinLength, matchRegex } from "./utils/validator";
+import { updatePrTitleAndLabel } from "./updatePr";
 
 const MIN_LEN_PR_DESCRIPTION = 10;
 
@@ -26,7 +28,13 @@ export const main = async (): Promise<void> => {
     TE.fromOption(() => new Error("Jira ID not found in PR title")),
     TE.chain(getJiraIssues),
     TE.map(RA.map(fromJiraToGenericTicket)),
-    TE.bimap((err) => warn(err.message), renderTickets)
+    TE.bimap(
+      (err) => warn(err.message),
+      (tickets) => {
+        renderTickets(tickets);
+        updatePrTitleAndLabel(tickets);
+      }
+    )
   );
 
   schedule(addJiraTicket());
@@ -40,7 +48,7 @@ export const main = async (): Promise<void> => {
 
   pipe(
     matchRegex(danger.github.pr.body, /(WIP|work in progress)/i),
-    E.map(() =>
+    O.map(() =>
       warn(
         "WIP keyword in PR title is deprecated, please create a Draft PR instead."
       )

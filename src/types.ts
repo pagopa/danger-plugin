@@ -2,10 +2,18 @@
  * type definition for generic tickets / stories and Jira conversion
  */
 
+import { Ord } from "fp-ts/lib/Ord";
 import { JIRA_HOST_NAME } from "./jira";
 import { JiraIssueTypeName, JiraIssueResponse } from "./jira/types";
 
 export type GenericTicketType = "feat" | "fix" | "chore" | "epic";
+
+export const ticketPriority: Record<GenericTicketType, number> = {
+  chore: 0,
+  epic: 3,
+  feat: 2,
+  fix: 1,
+};
 
 export interface GenericTicket {
   readonly id: string;
@@ -20,6 +28,16 @@ export interface GenericTicket {
   // is a subtask linked with a father ticket?
   readonly parent?: GenericTicket;
 }
+
+export const ticketOrdByType: Ord<GenericTicket> = {
+  equals: (x, y) => x.type === y.type,
+  compare: (x, y) =>
+    ticketPriority[x.type] < ticketPriority[y.type]
+      ? -1
+      : ticketPriority[x.type] > ticketPriority[y.type]
+      ? 1
+      : 0,
+};
 
 /**
  * From {@link JiraIssueTypeName} to {@link GenericTicketType}
