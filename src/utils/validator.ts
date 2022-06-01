@@ -18,5 +18,5 @@ export const popFromRegex = (s: string, regex: RegExp): O.Option<string> =>
     O.chainNullableK((el) => el.pop())
   );
 
-export const sameScope = (scopes: ReadonlyArray<Scope>): boolean =>
+export const isSameScope = (scopes: ReadonlyArray<Scope>): boolean =>
   scopes.every((val, _, arr) => val === arr[0]);

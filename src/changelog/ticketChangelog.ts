@@ -8,7 +8,7 @@ import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
 import { pipe } from "fp-ts/lib/function";
 import { GenericTicket } from "../types";
-import { popFromRegex, sameScope } from "../utils/validator";
+import { popFromRegex, isSameScope } from "../utils/validator";
 import { Scope, projectToScope, tagToScope } from "./types";
 
 export declare function warn(message: string): void;
@@ -96,7 +96,7 @@ export const getTicketsScope = (
     RA.map(getTicketScope),
     RA.sequence(E.Applicative),
     E.chain((el) =>
-      sameScope(el)
+      isSameScope(el)
         ? pipe(
             RA.head(el),
             E.fromOption(
