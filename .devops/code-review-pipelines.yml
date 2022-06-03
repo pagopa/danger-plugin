@@ -33,7 +33,7 @@ stages:
     jobs:
       - job: make_build
         steps:
-          - template: setup-project.yml
+          - template: templates/node-job-setup/template.yaml@pagopaCommons
           - script: |
               yarn build
             displayName: "Build"
@@ -50,7 +50,7 @@ stages:
           )
           )
         steps:
-          - template: setup-project.yml
+          - template: templates/node-job-setup/template.yaml@pagopaCommons
           - bash: |
               yarn danger ci
             env:
