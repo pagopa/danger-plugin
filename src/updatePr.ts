@@ -5,7 +5,7 @@
 import { pipe } from "fp-ts/lib/function";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
-import * as RA from "fp-ts/lib/ReadOnlyArray";
+import * as RA from "fp-ts/lib/ReadonlyArray";
 import { DangerDSLType } from "danger/distribution/dsl/DangerDSL";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { ap } from "fp-ts/lib/Identity";

@@ -5,7 +5,7 @@
 
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
-import * as RA from "fp-ts/lib/ReadOnlyArray";
+import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as R from "fp-ts/Record";
 import { pipe } from "fp-ts/lib/function";
 import { fold } from "fp-ts/boolean";

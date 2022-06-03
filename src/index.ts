@@ -1,7 +1,7 @@
 import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
-import * as RA from "fp-ts/lib/ReadOnlyArray";
+import * as RA from "fp-ts/lib/ReadonlyArray";
 import { pipe } from "fp-ts/function";
 
 // Provides dev-time typing structure for  `danger` - doesn't affect runtime.
