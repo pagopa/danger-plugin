@@ -11,7 +11,7 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { ap } from "fp-ts/lib/Identity";
 import { GenericTicket, ticketOrdByType } from "./types";
 import { getTicketsScope } from "./changelog/ticketChangelog";
-import { popFromRegexC } from "./utils/validator";
+import { popFromRegex } from "./utils/validator";
 
 declare const danger: DangerDSLType;
 export declare function warn(message: string): void;
@@ -65,7 +65,7 @@ export const updatePrTitleAndLabel = (
   );
 
   const title = pipe(
-    popFromRegexC,
+    popFromRegex,
     ap(danger.github.pr.title),
     ap(cleanChangelogRegex),
     O.getOrElse(() => danger.github.pr.title)

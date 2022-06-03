@@ -1,26 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-export type Scope =
-  | "Android"
-  | "iOS"
-  | "Bonus Vacanze"
-  | "Messages"
-  | "Payments"
-  | "Services"
-  | "Profile"
-  | "Privacy"
-  | "Security"
-  | "Accessibility"
-  | "Bonus Pagamenti Digitali"
-  | "Carta Giovani Nazionale"
-  | "Federated Identity Management System"
-  | "My Portal"
-  | "Sicilia Vola"
-  | "EU Covid Certificate"
-  | "Redesign Servizi"
-  | "Zendesk"
-  | "Piattaforma Notifiche"
-  | "Federated Identity Management System"
-  | "Carta della cultura";
+
+import { Scope } from "../types";
 
 export const tagToScope: Record<string, Scope> = {
   android: "Android",

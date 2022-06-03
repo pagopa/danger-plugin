@@ -7,12 +7,11 @@ import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as R from "fp-ts/Record";
-import { pipe } from "fp-ts/lib/function";
-import { fold } from "fp-ts/boolean";
+import { flow, pipe } from "fp-ts/lib/function";
 import { ap } from "fp-ts/lib/Identity";
-import { GenericTicket } from "../types";
-import { popFromRegexC, isSameScope } from "../utils/validator";
-import { Scope, projectToScope, tagToScope } from "./types";
+import { GenericTicket, Scope } from "../types";
+import { popFromRegex, isSameScope } from "../utils/validator";
+import { projectToScope, tagToScope } from "./types";
 
 const scopeLabelRegex = /(changelog-scope:|epic-)(.*)/m;
 
@@ -33,55 +32,38 @@ export const getProjectScope = (
     )
   );
 
+const validateLabel = (label: string): O.Option<string> =>
+  pipe(label, popFromRegex, ap(scopeLabelRegex));
+
+const getValidLabels = flow(
+  (t: GenericTicket) => t.tags,
+  RA.map(validateLabel),
+  RA.compact
+);
+
 /**
  * Try to detect the {@link Scope} of the ticket by tags associated
  */
-export const getTagsScope = (ticket: GenericTicket): E.Either<Error, Scope> => {
-  const possibleScopes = pipe(
-    ticket.tags,
-    RA.map((l) => pipe(popFromRegexC, ap(l), ap(scopeLabelRegex))),
-    RA.filter(O.isSome)
-  );
-
-  const getFirstScope = pipe(
-    possibleScopes,
-    RA.head,
-    O.compact,
-    O.map((e) => pipe(tagToScope, R.lookup(e))),
-    O.compact,
-    E.fromOption(
-      () => new Error(`The scope of the tag is not present in the allowed list`)
-    )
-  );
-
-  return pipe(
-    possibleScopes,
-    RA.isEmpty,
-    fold(
+export const getTagsScope = (ticket: GenericTicket): E.Either<Error, Scope> =>
+  pipe(
+    ticket,
+    getValidLabels, // but I think that we can do a straighter validation
+    E.of,
+    E.filterOrElse(
+      (labels) => labels.length > 1,
       () =>
-        pipe(
-          RA.size(possibleScopes) > 1,
-          fold(
-            () => getFirstScope,
-            () =>
-              E.left(
-                new Error(
-                  `Multiple labels match the expression \`${scopeLabelRegex}\` for the ticket [#${ticket.id}].\n
-             It is not possible to assign a single scope to this pull request!`
-                )
-              )
-          )
-        ),
+        new Error(`Multiple labels match the expression \`${scopeLabelRegex}\` for the ticket [#${ticket.id}].\n
+     It is not possible to assign a single scope to this pull request!`)
+    ),
+    E.chainOptionK(
       () =>
-        E.left(
-          new Error(
-            `No labels match the expression \`${scopeLabelRegex}\` for the ticket [#${ticket.id}].\n
-       It is not possible to assign a scope to this pull request!`
-          )
-        )
-    )
+        new Error(`No labels match the expression \`${scopeLabelRegex}\` for the ticket [#${ticket.id}].\n
+     It is not possible to assign a scope to this pull request!`)
+    )(RA.head),
+    E.chainOptionK(
+      () => new Error("The scope of the tag is not present in the allowed list")
+    )((label) => pipe(tagToScope, R.lookup(label)))
   );
-};
 
 /**
  * Try to detect the {@link Scope} of the ticket first by projectId and then by tag

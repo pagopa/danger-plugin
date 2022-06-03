@@ -1,30 +1,26 @@
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/lib/function";
-import { Scope } from "../changelog/types";
+import { Scope } from "../types";
 
 export const checkMinLength = (s: string, n: number): E.Either<Error, string> =>
   s.length >= n
     ? E.right(s)
     : E.left(new Error(`at least ${n} characters required`));
 
-const matchRegex = (s: string, regex: RegExp): O.Option<string> =>
-  s.match(regex) ? O.some(s) : O.none;
-export const matchRegexC =
+export const matchRegex =
   (s: string) =>
   (regex: RegExp): O.Option<string> =>
-    matchRegex(s, regex);
+    s.match(regex) ? O.some(s) : O.none;
 
-const popFromRegex = (s: string, regex: RegExp): O.Option<string> =>
-  pipe(
-    s.match(regex),
-    O.fromNullable,
-    O.chainNullableK((el) => el.pop())
-  );
-export const popFromRegexC =
+export const popFromRegex =
   (s: string) =>
   (regex: RegExp): O.Option<string> =>
-    popFromRegex(s, regex);
+    pipe(
+      s.match(regex),
+      O.fromNullable,
+      O.chainNullableK((el) => el.pop())
+    );
 
 export const isSameScope = (scopes: ReadonlyArray<Scope>): boolean =>
   scopes.every((val, _, arr) => val === arr[0]);

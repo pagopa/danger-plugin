@@ -7,6 +7,7 @@ import { JIRA_HOST_NAME } from "./jira";
 import { JiraIssueTypeName, JiraIssueResponse } from "./jira/types";
 
 export type GenericTicketType = "feat" | "fix" | "chore" | "epic";
+export type Scope = string;
 
 export const ticketPriority: Record<GenericTicketType, number> = {
   chore: 0,
