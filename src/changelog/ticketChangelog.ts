@@ -6,17 +6,15 @@
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
+import * as R from "fp-ts/Record";
 import { pipe } from "fp-ts/lib/function";
+import { fold } from "fp-ts/boolean";
+import { ap } from "fp-ts/lib/Identity";
 import { GenericTicket } from "../types";
-import { popFromRegex, isSameScope } from "../utils/validator";
+import { popFromRegexC, isSameScope } from "../utils/validator";
 import { Scope, projectToScope, tagToScope } from "./types";
 
-export declare function warn(message: string): void;
-export declare function markdown(message: string): void;
-export declare function schedule<T>(asyncFunction: Promise<T>): void;
-
-// pattern used to recognize a scope label
-const regex = /(changelog-scope:|epic-)(.*)/m;
+const scopeLabelRegex = /(changelog-scope:|epic-)(.*)/m;
 
 /**
  *Try to detect the {@link Scope} of the ticket by projectId
@@ -25,7 +23,8 @@ export const getProjectScope = (
   ticket: GenericTicket
 ): E.Either<Error, Scope> =>
   pipe(
-    O.fromNullable(projectToScope[ticket.projectId]),
+    projectToScope,
+    R.lookup(ticket.projectId),
     E.fromOption(
       () =>
         new Error(
@@ -40,36 +39,48 @@ export const getProjectScope = (
 export const getTagsScope = (ticket: GenericTicket): E.Either<Error, Scope> => {
   const possibleScopes = pipe(
     ticket.tags,
-    RA.map((l) => popFromRegex(l, regex)),
+    RA.map((l) => pipe(popFromRegexC, ap(l), ap(scopeLabelRegex))),
     RA.filter(O.isSome)
   );
 
-  if (possibleScopes.length === 0) {
-    return E.left(
-      new Error(
-        `No labels match the expression \`${regex}\` for the ticket [#${ticket.id}].\n
-     It is not possible to assign a scope to this pull request!`
-      )
-    );
-  } else if (possibleScopes.length > 1) {
-    return E.left(
-      new Error(
-        `Multiple labels match the expression \`${regex}\` for the ticket [#${ticket.id}].\n
-     It is not possible to assign a single scope to this pull request!`
-      )
-    );
-  } else {
-    return pipe(
-      possibleScopes,
-      RA.head,
-      O.compact,
-      O.chainNullableK((el) => tagToScope[el]),
-      E.fromOption(
-        () =>
-          new Error(`The scope of the tag is not present in the allowed list`)
-      )
-    );
-  }
+  const getFirstScope = pipe(
+    possibleScopes,
+    RA.head,
+    O.compact,
+    O.map((e) => pipe(tagToScope, R.lookup(e))),
+    O.compact,
+    E.fromOption(
+      () => new Error(`The scope of the tag is not present in the allowed list`)
+    )
+  );
+
+  return pipe(
+    possibleScopes,
+    RA.isEmpty,
+    fold(
+      () =>
+        pipe(
+          RA.size(possibleScopes) > 1,
+          fold(
+            () => getFirstScope,
+            () =>
+              E.left(
+                new Error(
+                  `Multiple labels match the expression \`${scopeLabelRegex}\` for the ticket [#${ticket.id}].\n
+             It is not possible to assign a single scope to this pull request!`
+                )
+              )
+          )
+        ),
+      () =>
+        E.left(
+          new Error(
+            `No labels match the expression \`${scopeLabelRegex}\` for the ticket [#${ticket.id}].\n
+       It is not possible to assign a scope to this pull request!`
+          )
+        )
+    )
+  );
 };
 
 /**

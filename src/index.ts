@@ -6,12 +6,13 @@ import { pipe } from "fp-ts/function";
 
 // Provides dev-time typing structure for  `danger` - doesn't affect runtime.
 // https://github.com/danger/danger-js/blob/main/docs/usage/extending-danger.html.md#writing-your-plugin
+import { ap } from "fp-ts/lib/Identity";
 import { DangerDSLType } from "../node_modules/danger/distribution/dsl/DangerDSL";
 import { getJiraIdFromPrTitle } from "./utils/titleParser";
 import { renderTickets } from "./dangerRender";
 import { getJiraIssues } from "./jira";
 import { fromJiraToGenericTicket } from "./types";
-import { checkMinLength, matchRegex } from "./utils/validator";
+import { checkMinLength, matchRegexC } from "./utils/validator";
 import { updatePrTitleAndLabel } from "./updatePr";
 
 const MIN_LEN_PR_DESCRIPTION = 10;
@@ -47,7 +48,9 @@ export const main = async (): Promise<void> => {
   );
 
   pipe(
-    matchRegex(danger.github.pr.body, /(WIP|work in progress)/i),
+    matchRegexC,
+    ap(danger.github.pr.body),
+    ap(/(WIP|work in progress)/i),
     O.map(() =>
       warn(
         "WIP keyword in PR title is deprecated, please create a Draft PR instead."

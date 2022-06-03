@@ -1,5 +1,3 @@
-import { Eq } from "fp-ts/lib/Eq";
-
 /* eslint-disable sonarjs/no-duplicate-string */
 export type Scope =
   | "Android"
@@ -23,10 +21,6 @@ export type Scope =
   | "Piattaforma Notifiche"
   | "Federated Identity Management System"
   | "Carta della cultura";
-
-export const EqScope: Eq<Scope> = {
-  equals: (first, second) => first === second,
-};
 
 export const tagToScope: Record<string, Scope> = {
   android: "Android",
