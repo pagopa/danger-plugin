@@ -13,5 +13,6 @@ export const getJiraIdFromPrTitle = (
   pipe(
     title.match(jiraRegex),
     O.fromNullable,
-    O.map((a) => a[1].split(","))
+    O.chainNullableK((el) => el[1]),
+    O.map((el) => el.split(","))
   );

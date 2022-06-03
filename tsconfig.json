@@ -10,7 +10,8 @@
     "strict": true,
     "declaration": true,
     "declarationDir": "dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": ["src/**/*.ts"],
   "exclude": [

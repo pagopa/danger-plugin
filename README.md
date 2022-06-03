@@ -33,3 +33,17 @@ Furthermore, to access the Jira API it is necessary to create a token relating t
 JIRA_USERNAME=account@pagopa.it
 JIRA_PASSWORD=token...
 ```
+
+## How to use
+To use this plugin it is necessary to import the main function inside the Dangerfile.ts file and define a RecordScope that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it.
+
+```
+export type Scope = string;
+
+export interface RecordScope {
+  readonly tagToScope: Record<string, Scope>;
+  readonly projectToScope: Record<string, Scope>;
+}
+```
+
+Look at the [Dangerfile.ts](https://github.com/pagopa/danger-plugin/blob/master/Dangerfile.ts) file to better understand how to structure it.
