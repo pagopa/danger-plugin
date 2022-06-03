@@ -36,9 +36,7 @@ stages:
           succeeded(),
           and(
           eq(variables['Build.Reason'], 'PullRequest'),
-          ne(variables['DANGER_GITHUB_API_TOKEN'], 'skip'),
-          ne(variables['JIRA_USERNAME'], ''),
-          ne(variables['JIRA_PASSWORD'], '')
+          ne(variables['DANGER_GITHUB_API_TOKEN'], 'skip')
           )
           )
         steps:
