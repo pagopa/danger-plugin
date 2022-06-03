@@ -29,10 +29,9 @@ export const renderTickets = (
       const subtask = s.parent
         ? ` \n _subtask of_\n     * ${renderTicket(s.parent)}`
         : "";
-      return `  * ${renderTicket(s)}${subtask}`;
+      return ` * ${renderTicket(s)}${subtask}`;
     })
     .join("\n");
   markdown(`
-  ## Affected stories
-  ${ticketListToString}\n`);
+  ## Affected stories\n${ticketListToString}\n`);
 };
