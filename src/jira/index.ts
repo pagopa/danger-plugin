@@ -4,7 +4,7 @@
 
 import JiraApi = require("jira-client");
 import * as TE from "fp-ts/lib/TaskEither";
-import * as A from "fp-ts/lib/ReadonlyArray";
+import * as A from "fp-ts/ReadonlyArray";
 import { toError } from "fp-ts/lib/Either";
 import { errorsToReadableMessages } from "@pagopa/ts-commons/lib/reporters";
 import { pipe } from "fp-ts/lib/function";

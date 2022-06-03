@@ -36,8 +36,8 @@ stages:
           - template: setup-project.yml
           - script: |
               yarn build
-            displayName: 'Build'
-            
+            displayName: "Build"
+
   - stage: Static_analysis
     dependsOn: []
     jobs:
