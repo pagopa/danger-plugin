@@ -9,6 +9,11 @@ import { JiraIssueTypeName, JiraIssueResponse } from "./jira/types";
 export type GenericTicketType = "feat" | "fix" | "chore" | "epic";
 export type Scope = string;
 
+export interface RecordScope {
+  readonly tagToScope: Record<string, Scope>;
+  readonly projectToScope: Record<string, Scope>;
+}
+
 export const ticketPriority: Record<GenericTicketType, number> = {
   chore: 0,
   epic: 3,

@@ -11,7 +11,7 @@ import { DangerDSLType } from "../node_modules/danger/distribution/dsl/DangerDSL
 import { getJiraIdFromPrTitle } from "./utils/titleParser";
 import { renderTickets } from "./dangerRender";
 import { getJiraIssues } from "./jira";
-import { fromJiraToGenericTicket } from "./types";
+import { fromJiraToGenericTicket, RecordScope } from "./types";
 import { checkMinLength, matchRegex } from "./utils/validator";
 import { updatePrTitleAndLabel } from "./updatePr";
 
@@ -22,7 +22,7 @@ export declare function schedule<T>(asyncFunction: Promise<T>): void;
 export declare function warn(message: string): void;
 
 // This is the main method called at the begin from Dangerfile.ts
-export const main = async (): Promise<void> => {
+export const main = async (recordScope: RecordScope): Promise<void> => {
   const addJiraTicket = pipe(
     danger.github.pr.title,
     getJiraIdFromPrTitle,
@@ -33,7 +33,7 @@ export const main = async (): Promise<void> => {
       (err) => warn(err.message),
       (tickets) => {
         renderTickets(tickets);
-        updatePrTitleAndLabel(tickets);
+        updatePrTitleAndLabel(tickets)(recordScope);
       }
     )
   );
