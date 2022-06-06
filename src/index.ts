@@ -3,6 +3,7 @@ import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
 import { pipe } from "fp-ts/function";
+import yarn from "danger-plugin-yarn";
 
 // Provides dev-time typing structure for  `danger` - doesn't affect runtime.
 // https://github.com/danger/danger-js/blob/main/docs/usage/extending-danger.html.md#writing-your-plugin
@@ -57,4 +58,6 @@ export const main = async (recordScope: RecordScope): Promise<void> => {
       )
     )
   );
+
+  schedule(yarn());
 };
