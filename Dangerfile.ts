@@ -1,8 +1,8 @@
 import customRules from "./src/index";
 import { RecordScope } from "./src/types";
-import { schedule } from 'danger'
+import { schedule } from "danger";
 
-export const recordScope: RecordScope = {
+const recordScope: RecordScope = {
   projectToScope: {
     2449547: "Bonus Vacanze",
     2463683: "My Portal",

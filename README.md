@@ -17,7 +17,7 @@ This module provides custom rules over [Danger](https://danger.systems/js/) CI a
 
 ## Usage
 
-To use you must already have `danger-js` set up in your repo. 
+To use you must already have `danger-js` set up in your repo.
 If you haven't configured it yet:
 
 ```sh
@@ -31,7 +31,8 @@ yarn add @pagopa/danger-plugin --dev
 ```
 
 ### At a glance
-Create a new file `Dangerfile.ts` in your root working dir. It is necessary to define a `RecordScope` that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it. 
+
+Create a new file `Dangerfile.ts` in your root working dir. It is necessary to define a `RecordScope` that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it.
 
 ```js
 // Dangerfile.ts
@@ -54,9 +55,8 @@ const recordScope: RecordScope = {
 };
 
 customRules(recordScope);
-
-
 ```
+
 Look at the [Dangerfile.ts](https://github.com/pagopa/danger-plugin/blob/master/Dangerfile.ts) file to better understand how to structure it.
 
 ### Creating a bot account for Danger to use
@@ -79,6 +79,7 @@ JIRA_PASSWORD=token...
 ```
 
 ### DevOps pipeline
+
 example of a pipeline stage for the code review
 
 ```yml
@@ -103,5 +104,4 @@ stages:
               JIRA_USERNAME: "$(JIRA_USERNAME)"
               JIRA_PASSWORD: "$(JIRA_PASSWORD)"
             displayName: "Danger CI"
-
 ```
