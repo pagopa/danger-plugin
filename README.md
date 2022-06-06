@@ -1,5 +1,10 @@
 # Custom DangerJS rules plugin
 
+![npm](https://img.shields.io/npm/v/@pagopa/danger-plugin?color=green&label=%40pagopa%2Fdanger-plugin&logo=npm)
+![Azure DevOps builds](https://img.shields.io/azure-devops/build/pagopaspa/a1eb6f06-1593-4a60-b2aa-9ff49c60340d/672?label=Code%20review)
+![Azure DevOps builds](https://img.shields.io/azure-devops/build/pagopaspa/a1eb6f06-1593-4a60-b2aa-9ff49c60340d/671?label=Deploy)
+![npm type definitions](https://img.shields.io/npm/types/@pagopa/danger-plugin)
+
 This module provides custom rules over [Danger](https://danger.systems/js/) CI automation.
 
 ## Features
