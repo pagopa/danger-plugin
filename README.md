@@ -32,13 +32,14 @@ yarn add @pagopa/danger-plugin --dev
 
 ### At a glance
 
-Create a new file `Dangerfile.ts` in your root working dir. It is necessary to define a `RecordScope` that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it.
+Create a new file `Dangerfile.ts` in your root working dir. It is **optional** to define a `RecordScope` that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it.
 
 ```js
 // Dangerfile.ts
 import customRules from "@pagopa/danger-plugin";
 import { RecordScope } from "@pagopa/danger-plugin/dist/types";
 
+//This paramter is optional
 const recordScope: RecordScope = {
   projectToScope: {
     IAC: "Bonus Pagamenti Digitali",
