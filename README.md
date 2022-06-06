@@ -54,8 +54,7 @@ const recordScope: RecordScope = {
   },
 };
 
-// Using schedule because this is an async task
-customRules(recordScope)
+customRules(recordScope);
 
 
 ```
