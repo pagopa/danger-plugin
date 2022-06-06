@@ -35,4 +35,4 @@ export const recordScope: RecordScope = {
   },
 };
 
-schedule(customRules(recordScope))
+customRules(recordScope);
