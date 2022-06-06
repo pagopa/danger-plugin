@@ -16,9 +16,51 @@ This module provides custom rules over [Danger](https://danger.systems/js/) CI a
 - Perform sanity checks on yarn.lock
 - Warn if `npm`-related files are added (as we use `yarn`)
 
-## Installation
+## Usage
 
-Adding the Danger module by `yarn add @pagopa/danger-plugin --dev`. This will add Danger as a devDependency and make the command danger available by running `yarn danger`.
+To use you must already have `danger-js` set up in your repo. 
+If you haven't configured it yet:
+
+```sh
+yarn add danger --dev
+```
+
+### Install
+
+```sh
+yarn add @pagopa/danger-plugin --dev
+```
+
+### At a glance
+Create a new file `Dangerfile.ts` in your root working dir. It is necessary to define a `RecordScope` that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it. 
+
+```js
+// Dangerfile.ts
+import { schedule } from 'danger'
+import { customRules } from "@pagopa/danger-plugin";
+import { RecordScope } from "@pagopa/danger-plugin/dist/types";
+
+const recordScope: RecordScope = {
+  projectToScope: {
+    IAC: "Bonus Pagamenti Digitali",
+    IOACGN: "Carta Giovani Nazionale",
+    IAGP: "EU Covid Certificate",
+  },
+  tagToScope: {
+    android: "Android",
+    ios: "iOS",
+    messages: "Messages",
+    payments: "Payments",
+    services: "Services",
+  },
+};
+
+// Using schedule because this is an async task
+schedule(customRules(recordScope))
+
+
+```
+Look at the [Dangerfile.ts](https://github.com/pagopa/danger-plugin/blob/master/Dangerfile.ts) file to better understand how to structure it.
 
 ### Creating a bot account for Danger to use
 
@@ -39,16 +81,4 @@ JIRA_USERNAME=account@pagopa.it
 JIRA_PASSWORD=token...
 ```
 
-## How to use
-To use this plugin it is necessary to import the main function inside the Dangerfile.ts file and define a RecordScope that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it.
 
-```
-export type Scope = string;
-
-export interface RecordScope {
-  readonly tagToScope: Record<string, Scope>;
-  readonly projectToScope: Record<string, Scope>;
-}
-```
-
-Look at the [Dangerfile.ts](https://github.com/pagopa/danger-plugin/blob/master/Dangerfile.ts) file to better understand how to structure it.
