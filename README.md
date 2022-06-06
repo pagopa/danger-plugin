@@ -13,7 +13,6 @@ This module provides custom rules over [Danger](https://danger.systems/js/) CI a
 - Warn when a PR has no description
 - Update the PR title with the right changelog configuration and scope
 - Update the generated changelog, adding the link to the related Jira ticket
-- Perform sanity checks on yarn.lock
 - Warn if `npm`-related files are added (as we use `yarn`)
 
 ## Usage
