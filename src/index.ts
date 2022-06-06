@@ -18,11 +18,12 @@ import { updatePrTitleAndLabel } from "./updatePr";
 const MIN_LEN_PR_DESCRIPTION = 10;
 
 declare const danger: DangerDSLType;
+declare function schedule<T>(asyncFunction: Promise<T>): void;
 declare function warn(message: string): void;
 
 // This is the main method called at the begin from Dangerfile.ts
 export const customRules = async (recordScope: RecordScope): Promise<void> => {
-  pipe(
+  const addJiraTicket = pipe(
     danger.github.pr.title,
     getJiraIdFromPrTitle,
     TE.fromOption(() => new Error("Jira ID not found in PR title")),
@@ -36,6 +37,7 @@ export const customRules = async (recordScope: RecordScope): Promise<void> => {
       }
     )
   );
+  schedule(addJiraTicket());
 
   pipe(
     checkMinLength(danger.github.pr.body, MIN_LEN_PR_DESCRIPTION),
