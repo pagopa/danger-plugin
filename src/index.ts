@@ -22,7 +22,12 @@ declare function schedule<T>(asyncFunction: Promise<T>): void;
 declare function warn(message: string): void;
 
 // This is the main method called at the begin from Dangerfile.ts
-const customRules = async (recordScope: RecordScope): Promise<void> => {
+const customRules = async (
+  recordScope: RecordScope = {
+    projectToScope: {},
+    tagToScope: {},
+  }
+): Promise<void> => {
   const addJiraTicket = pipe(
     danger.github.pr.title,
     getJiraIdFromPrTitle,
