@@ -66,7 +66,7 @@ In order to get the most out of Danger, we recommend giving it the ability to po
 
 ### Environment variables
 
-A tokem related to github bot account is required to enable the reading of the repo and comment the PR on github to be set in the environment variable:
+A token related to github bot account is required to enable the reading of the repo and comment the PR on github to be set in the environment variable:
 
 ```
 DANGER_GITHUB_API_TOKEN="....."
@@ -79,4 +79,30 @@ JIRA_USERNAME=account@pagopa.it
 JIRA_PASSWORD=token...
 ```
 
+### DevOps pipeline
+example of a pipeline stage for the code review
 
+```yml
+stages:
+  - stage: Static_analysis
+    dependsOn: []
+    jobs:
+      - job: danger
+        condition: and(
+          succeeded(),
+          and(
+          eq(variables['Build.Reason'], 'PullRequest'),
+          ne(variables['DANGER_GITHUB_API_TOKEN'], 'skip')
+          )
+          )
+        steps:
+          - template: templates/node-job-setup/template.yaml@pagopaCommons
+          - bash: |
+              yarn danger ci
+            env:
+              DANGER_GITHUB_API_TOKEN: "$(DANGER_GITHUB_API_TOKEN)"
+              JIRA_USERNAME: "$(JIRA_USERNAME)"
+              JIRA_PASSWORD: "$(JIRA_PASSWORD)"
+            displayName: "Danger CI"
+
+```
