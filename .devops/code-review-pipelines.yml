@@ -48,3 +48,17 @@ stages:
               JIRA_USERNAME: "$(JIRA_USERNAME)"
               JIRA_PASSWORD: "$(JIRA_PASSWORD)"
             displayName: "Danger CI"
+      - job: ts_type_check
+        displayName: "Type check"
+        continueOnError: false
+        steps:
+          - template: templates/node-job-setup/template.yaml@pagopaCommons
+          - script: yarn tsc --noEmit
+            displayName: "Run TypeScript compiler"
+      - job: lint
+        displayName: "Lint"
+        continueOnError: false
+        steps:
+          - template: templates/node-job-setup/template.yaml@pagopaCommons
+          - script: yarn run lint
+            displayName: "Run linter"

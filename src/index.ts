@@ -3,7 +3,6 @@ import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
 import { pipe } from "fp-ts/function";
-import yarn from "danger-plugin-yarn";
 
 // Provides dev-time typing structure for  `danger` - doesn't affect runtime.
 // https://github.com/danger/danger-js/blob/main/docs/usage/extending-danger.html.md#writing-your-plugin
@@ -19,12 +18,11 @@ import { updatePrTitleAndLabel } from "./updatePr";
 const MIN_LEN_PR_DESCRIPTION = 10;
 
 declare const danger: DangerDSLType;
-export declare function schedule<T>(asyncFunction: Promise<T>): void;
-export declare function warn(message: string): void;
+declare function warn(message: string): void;
 
 // This is the main method called at the begin from Dangerfile.ts
-export const main = async (recordScope: RecordScope): Promise<void> => {
-  const addJiraTicket = pipe(
+export const customRules = async (recordScope: RecordScope): Promise<void> => {
+  pipe(
     danger.github.pr.title,
     getJiraIdFromPrTitle,
     TE.fromOption(() => new Error("Jira ID not found in PR title")),
@@ -38,8 +36,6 @@ export const main = async (recordScope: RecordScope): Promise<void> => {
       }
     )
   );
-
-  schedule(addJiraTicket());
 
   pipe(
     checkMinLength(danger.github.pr.body, MIN_LEN_PR_DESCRIPTION),
@@ -58,6 +54,4 @@ export const main = async (recordScope: RecordScope): Promise<void> => {
       )
     )
   );
-
-  schedule(yarn());
 };

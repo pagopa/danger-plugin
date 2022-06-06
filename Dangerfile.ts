@@ -1,5 +1,6 @@
-import { main } from "./src/index";
-import { RecordScope, Scope } from "./src/types";
+import { customRules } from "./src/index";
+import { RecordScope } from "./src/types";
+import { schedule } from 'danger'
 
 export const recordScope: RecordScope = {
   projectToScope: {
@@ -34,4 +35,4 @@ export const recordScope: RecordScope = {
   },
 };
 
-main(recordScope);
+schedule(customRules(recordScope))

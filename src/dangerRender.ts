@@ -5,9 +5,7 @@
 import { MarkdownString } from "../node_modules/danger/distribution/dsl/Aliases";
 import { GenericTicketType, GenericTicket } from "./types";
 
-export declare function warn(message: string): void;
-export declare function markdown(message: MarkdownString): void;
-export declare function schedule<T>(asyncFunction: Promise<T>): void;
+declare function markdown(message: MarkdownString): void;
 
 const StoryEmoji: Record<GenericTicketType, string> = {
   chore: "⚙️",

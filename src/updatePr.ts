@@ -15,9 +15,8 @@ import { getTicketsScope } from "./changelog/ticketChangelog";
 import { popFromRegex } from "./utils/validator";
 
 declare const danger: DangerDSLType;
-export declare function warn(message: string): void;
-export declare function markdown(message: string): void;
-export declare function schedule<T>(asyncFunction: Promise<T>): void;
+declare function warn(message: string): void;
+declare function schedule<T>(asyncFunction: Promise<T>): void;
 
 const cleanChangelogRegex =
   /^(fix(\(.+\))?!?: |feat(\(.+\))?!?: |chore(\(.+\))?!?: )?(.*)$/;
