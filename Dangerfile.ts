@@ -1,4 +1,4 @@
-import { customRules } from "./src/index";
+import customRules from "./src/index";
 import { RecordScope } from "./src/types";
 import { schedule } from 'danger'
 
