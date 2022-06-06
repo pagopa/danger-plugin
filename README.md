@@ -36,7 +36,6 @@ Create a new file `Dangerfile.ts` in your root working dir. It is necessary to d
 
 ```js
 // Dangerfile.ts
-import { schedule } from 'danger'
 import { customRules } from "@pagopa/danger-plugin";
 import { RecordScope } from "@pagopa/danger-plugin/dist/types";
 
@@ -56,7 +55,7 @@ const recordScope: RecordScope = {
 };
 
 // Using schedule because this is an async task
-schedule(customRules(recordScope))
+customRules(recordScope)
 
 
 ```
