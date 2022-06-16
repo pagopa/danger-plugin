@@ -1,8 +1,8 @@
 import customRules from "./src/index";
-import { RecordScope } from "./src/types";
-import { schedule } from "danger";
+import { Configuration } from "./src/types";
 
-const recordScope: RecordScope = {
+
+const config: Configuration = {
   projectToScope: {
     2449547: "Bonus Vacanze",
     2463683: "My Portal",
@@ -34,12 +34,8 @@ const recordScope: RecordScope = {
     fims: "Federated Identity Management System",
     myportal: "My Portal",
   },
+  updateLabel: true, //to add a label to the PR containing the name of the project linked to the ticket on Jira
+  updateTitle: false, //to change the title of the PR according to whether the ticket on Jira is a feat / fix / chore / epic
 };
 
-//to add a label to the PR containing the name of the project linked to the ticket on Jira
-const updateLabel = true;
-
-//to change the title of the PR according to whether the ticket on Jira is a feat / fix / chore / epic
-const updateTitle = false;
-
-customRules(recordScope, updateLabel, updateTitle);
+customRules(config);

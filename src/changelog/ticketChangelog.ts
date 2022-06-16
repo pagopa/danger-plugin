@@ -8,17 +8,17 @@ import * as RA from "fp-ts/ReadonlyArray";
 import * as R from "fp-ts/Record";
 import * as Rr from "fp-ts/Reader";
 import { pipe } from "fp-ts/lib/function";
-import { GenericTicket, RecordScope, Scope } from "../types";
+import { GenericTicket, Configuration, Scope } from "../types";
 import { isSameScope } from "../utils/validator";
 
 /**
  *Try to detect the {@link Scope} of the ticket by projectId
  */
 export const getProjectScope =
-  (ticket: GenericTicket): Rr.Reader<RecordScope, E.Either<Error, Scope>> =>
-  (projectToScope) =>
+  (ticket: GenericTicket): Rr.Reader<Configuration, E.Either<Error, Scope>> =>
+  (configuration) =>
     pipe(
-      projectToScope.projectToScope,
+      configuration.projectToScope,
       R.lookup(ticket.projectId),
       E.fromOption(
         () =>
@@ -32,9 +32,9 @@ export const getProjectScope =
  * Try to detect the {@link Scope} of the ticket by projectId
  */
 export const getTicketScope =
-  (ticket: GenericTicket): Rr.Reader<RecordScope, E.Either<Error, Scope>> =>
-  (projectToScope) =>
-    pipe(getProjectScope(ticket)(projectToScope));
+  (ticket: GenericTicket): Rr.Reader<Configuration, E.Either<Error, Scope>> =>
+  (configuration) =>
+    pipe(getProjectScope(ticket)(configuration));
 
 const findCommonScope = (
   either_array: ReadonlyArray<E.Either<Error, string>>
@@ -67,7 +67,7 @@ const findCommonScope = (
  */
 export const getTicketsScope = (
   tickets: ReadonlyArray<GenericTicket>
-): Rr.Reader<RecordScope, E.Either<Error, Scope>> =>
+): Rr.Reader<Configuration, E.Either<Error, Scope>> =>
   pipe(
     tickets,
     RA.map(getTicketScope),
