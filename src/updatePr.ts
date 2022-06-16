@@ -101,11 +101,11 @@ export const updatePrTitleAndLabel =
           const upperCaseTitle = pipe(
             splittingResults,
             O.fromNullable,
-            O.map((reg_array) =>
+            O.map((regs) =>
               sequenceS(O.Apply)({
-                task_id: pipe(reg_array, RA.lookup(1)),
+                task_id: pipe(regs, RA.lookup(1)),
                 title: pipe(
-                  reg_array,
+                  regs,
                   RA.lookup(2),
                   O.map((s) => s.charAt(0).toUpperCase() + s.slice(1))
                 ),

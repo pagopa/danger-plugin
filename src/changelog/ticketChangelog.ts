@@ -37,10 +37,10 @@ export const getTicketScope =
     pipe(getProjectScope(ticket)(configuration));
 
 const findCommonScope = (
-  either_array: ReadonlyArray<E.Either<Error, string>>
+  eithers: ReadonlyArray<E.Either<Error, string>>
 ): E.Either<Error, string> =>
   pipe(
-    either_array,
+    eithers,
     RA.sequence(E.Applicative),
     E.chain((el) =>
       isSameScope(el)
