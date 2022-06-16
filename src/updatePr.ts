@@ -6,10 +6,12 @@ import { pipe } from "fp-ts/lib/function";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
+import * as TE from "fp-ts/TaskEither";
 import { DangerDSLType } from "danger/distribution/dsl/DangerDSL";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { ap } from "fp-ts/lib/Identity";
 import * as Rr from "fp-ts/Reader";
+import { match } from "fp-ts/boolean";
 import { GenericTicket, Configuration, ticketOrdByType } from "./types";
 import { getTicketsScope } from "./changelog/ticketChangelog";
 import { popFromRegex } from "./utils/validator";
@@ -23,91 +25,120 @@ const cleanChangelogRegex =
 
 export const updatePrTitleAndLabel =
   (ticketList: ReadonlyArray<GenericTicket>): Rr.Reader<Configuration, void> =>
-  (configuration) =>
-    pipe(
-      getTicketsScope(ticketList),
-      Rr.map((e_scope) => {
-        const scope = pipe(
-          e_scope,
-          E.bimap(
-            (err) => warn(err.message),
-            (s) => `(${s})`
-          ),
-          E.fold(
-            () => "",
-            (s) => s
+  (configuration) => {
+    const scope = pipe(
+      getTicketsScope(ticketList)(configuration),
+      E.bimap(
+        (err) => warn(err.message),
+        (s) => `(${s})`
+      ),
+      E.fold(
+        () => "",
+        (s) => s
+      )
+    );
+
+    const updateLabelAction = pipe(
+      configuration.updateLabel,
+      match(
+        () => TE.left(new Error("updateLabel is disabled")),
+        () =>
+          pipe(
+            TE.tryCatch(
+              async () =>
+                danger.github.utils.createOrAddLabel({
+                  name: scope.replace("(", "").replace(")", ""),
+                  // The color is not used and can be customized from the "label" tab in the github page
+                  color: "#FFFFFF",
+                  description: scope,
+                }),
+              () => {
+                const errorMessage = "Eror during github label update";
+                warn(errorMessage);
+                return new Error(errorMessage);
+              }
+            )
           )
-        );
+      )
+    );
 
-        const updateLabelAction = danger.github.utils.createOrAddLabel({
-          name: scope.replace("(", "").replace(")", ""),
-          // The color is not used and can be customized from the "label" tab in the github page
-          color: "#FFFFFF",
-          description: scope,
-        });
+    schedule(updateLabelAction());
 
-        if (configuration.updateLabel) {
-          schedule(updateLabelAction);
-        }
+    const updateTitleAction = pipe(
+      configuration.updateTitle,
+      match(
+        () => TE.left(new Error("updateTitle is disabled")),
+        () => {
+          const ticketsSameType = pipe(
+            ticketList,
+            RA.sort(ticketOrdByType),
+            RA.uniq(ticketOrdByType)
+          );
 
-        const ticketsSameType = pipe(
-          ticketList,
-          RA.sort(ticketOrdByType),
-          RA.uniq(ticketOrdByType)
-        );
+          if (ticketsSameType.length > 1) {
+            warn(
+              "Multiple stories with different types are associated with this Pull request.\n" +
+                "Only one tag will be added, following the order: `feature > bug > chore`"
+            );
+          }
 
-        if (ticketsSameType.length > 1) {
-          warn(
-            "Multiple stories with different types are associated with this Pull request.\n" +
-              "Only one tag will be added, following the order: `feature > bug > chore`"
+          const tag = pipe(
+            RA.head(ticketsSameType),
+            O.map((t) => t.type),
+            O.getOrElse(() => "")
+          );
+
+          const title = pipe(
+            popFromRegex,
+            ap(danger.github.pr.title),
+            ap(cleanChangelogRegex),
+            O.getOrElse(() => danger.github.pr.title)
+          );
+
+          const titleSplitter = new RegExp(/(\[.*]\s*)(.+)/g);
+          const splittingResults = titleSplitter.exec(title);
+
+          const upperCaseTitle = pipe(
+            splittingResults,
+            O.fromNullable,
+            O.map((reg_array) =>
+              sequenceS(O.Apply)({
+                task_id: pipe(reg_array, RA.lookup(1)),
+                title: pipe(
+                  reg_array,
+                  RA.lookup(2),
+                  O.map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+                ),
+              })
+            ),
+            O.compact,
+            O.fold(
+              () => danger.github.pr.title,
+              (s) => `${s.task_id}${s.title}`
+            )
+          );
+
+          return pipe(
+            TE.tryCatch(
+              async () =>
+                schedule(
+                  danger.github.api.pulls.update({
+                    owner: danger.github.thisPR.owner,
+                    repo: danger.github.thisPR.repo,
+                    pull_number: danger.github.thisPR.number,
+                    title: `${tag}${scope}: ${upperCaseTitle}`,
+                  })
+                ),
+              () => {
+                const errorMessage = "Eror during github title update";
+                warn(errorMessage);
+                return new Error(errorMessage);
+              }
+            )
           );
         }
-
-        const tag = pipe(
-          RA.head(ticketsSameType),
-          O.map((t) => t.type),
-          O.getOrElse(() => "")
-        );
-
-        const title = pipe(
-          popFromRegex,
-          ap(danger.github.pr.title),
-          ap(cleanChangelogRegex),
-          O.getOrElse(() => danger.github.pr.title)
-        );
-
-        const titleSplitter = new RegExp(/(\[.*]\s*)(.+)/g);
-        const splittingResults = titleSplitter.exec(title);
-
-        const upperCaseTitle = pipe(
-          splittingResults,
-          O.fromNullable,
-          O.map((reg_array) =>
-            sequenceS(O.Apply)({
-              task_id: pipe(reg_array, RA.lookup(1)),
-              title: pipe(
-                reg_array,
-                RA.lookup(2),
-                O.map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-              ),
-            })
-          ),
-          O.compact,
-          O.fold(
-            () => danger.github.pr.title,
-            (s) => `${s.task_id}${s.title}`
-          )
-        );
-
-        const updateTitleAction = danger.github.api.pulls.update({
-          owner: danger.github.thisPR.owner,
-          repo: danger.github.thisPR.repo,
-          pull_number: danger.github.thisPR.number,
-          title: `${tag}${scope}: ${upperCaseTitle}`,
-        });
-
-        if (configuration.updateTitle) {
-          schedule(updateTitleAction);
-        }
-      })
+      )
     );
+
+    schedule(updateTitleAction());
+  };
