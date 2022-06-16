@@ -53,7 +53,7 @@ export const updatePrTitleAndLabel =
                   description: scope,
                 }),
               () => {
-                const errorMessage = "Eror during github label update";
+                const errorMessage = "Error during github label update";
                 warn(errorMessage);
                 return new Error(errorMessage);
               }
