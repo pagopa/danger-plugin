@@ -30,7 +30,12 @@ const customRules = async (
   const addJiraTicket = pipe(
     danger.github.pr.title,
     getJiraIdFromPrTitle,
-    TE.fromOption(() => new Error("Jira ID not found in PR title")),
+    TE.fromOption(
+      () =>
+        new Error(
+          "Jira ID not found in PR title. Please use the format [<project_id>-<sequence>]"
+        )
+    ),
     TE.chain(getJiraIssues),
     TE.map(RA.map(fromJiraToGenericTicket)),
     TE.bimap(
