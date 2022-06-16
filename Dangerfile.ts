@@ -16,6 +16,7 @@ const recordScope: RecordScope = {
     IAMVL: "Piattaforma Notifiche",
     IAFIMS: "Federated Identity Management System",
     AP: "Carta della cultura",
+    SFEQS: "Firma con IO",
   },
   tagToScope: {
     android: "Android",
