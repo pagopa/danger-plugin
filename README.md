@@ -54,10 +54,16 @@ const recordScope: RecordScope = {
   },
 };
 
-//to add a label to the PR containing the name of the project linked to the task on Jira. Default is false!
+/*
+* To add a label to the PR containing the name of the project linked to the task on Jira. 
+* Default is false!
+*/ 
 const updateLabel = true;
 
-//to change the title of the PR according to whether the task on Jira is a feat (Story) / fix (Bug) / chore (Sub-task) / epic. Default is false!
+/*
+* To change the title of the PR according to whether the task on Jira is a 
+* feat (Story) / fix (Bug) / chore (Sub-task) / epic. Default is false!
+*/
 const updateTitle = false;
 
 customRules(recordScope, updateLabel, updateTitle);
