@@ -35,4 +35,10 @@ const recordScope: RecordScope = {
   },
 };
 
-customRules(recordScope);
+//to add a label to the PR containing the name of the project linked to the ticket on Jira
+const updateLabel = true;
+
+//to change the title of the PR according to whether the ticket on Jira is a feat / fix / chore / epic
+const updateTitle = false;
+
+customRules(recordScope, updateLabel, updateTitle);

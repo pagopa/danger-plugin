@@ -22,7 +22,9 @@ const cleanChangelogRegex =
   /^(fix(\(.+\))?!?: |feat(\(.+\))?!?: |chore(\(.+\))?!?: )?(.*)$/;
 
 export const updatePrTitleAndLabel = (
-  ticketList: ReadonlyArray<GenericTicket>
+  ticketList: ReadonlyArray<GenericTicket>,
+  updateLabel: boolean,
+  updateTitle: boolean
 ): Rr.Reader<RecordScope, void> =>
   pipe(
     getTicketsScope(ticketList),
@@ -39,14 +41,16 @@ export const updatePrTitleAndLabel = (
         )
       );
 
-      const updateLabel = danger.github.utils.createOrAddLabel({
+      const updateLabelAction = danger.github.utils.createOrAddLabel({
         name: scope.replace("(", "").replace(")", ""),
         // The color is not used and can be customized from the "label" tab in the github page
         color: "#FFFFFF",
         description: scope,
       });
 
-      schedule(updateLabel);
+      if (updateLabel) {
+        schedule(updateLabelAction);
+      }
 
       const ticketsSameType = pipe(
         ticketList,
@@ -97,13 +101,15 @@ export const updatePrTitleAndLabel = (
         )
       );
 
-      const updateTitle = danger.github.api.pulls.update({
+      const updateTitleAction = danger.github.api.pulls.update({
         owner: danger.github.thisPR.owner,
         repo: danger.github.thisPR.repo,
         pull_number: danger.github.thisPR.number,
         title: `${tag}${scope}: ${upperCaseTitle}`,
       });
 
-      schedule(updateTitle);
+      if (updateTitle) {
+        schedule(updateTitleAction);
+      }
     })
   );
