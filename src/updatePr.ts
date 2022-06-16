@@ -52,17 +52,11 @@ export const updatePrTitleAndLabel =
                   color: "#FFFFFF",
                   description: scope,
                 }),
-              () => {
-                const errorMessage = "Error during github label update";
-                warn(errorMessage);
-                return new Error(errorMessage);
-              }
+              () => new Error("Error during github label update")
             )
           )
       )
     );
-
-    schedule(updateLabelAction());
 
     const updateTitleAction = pipe(
       configuration.updateTitle,
@@ -129,16 +123,24 @@ export const updatePrTitleAndLabel =
                     title: `${tag}${scope}: ${upperCaseTitle}`,
                   })
                 ),
-              () => {
-                const errorMessage = "Eror during github title update";
-                warn(errorMessage);
-                return new Error(errorMessage);
-              }
+              () => new Error("Eror during github title update")
             )
           );
         }
       )
     );
 
-    schedule(updateTitleAction());
+    schedule(
+      pipe(
+        updateLabelAction,
+        TE.mapLeft((err) => warn(err.message))
+      )()
+    );
+
+    schedule(
+      pipe(
+        updateTitleAction,
+        TE.mapLeft((err) => warn(err.message))
+      )()
+    );
   };
