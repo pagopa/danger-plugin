@@ -1,7 +1,6 @@
 import customRules from "./src/index";
 import { Configuration } from "./src/types";
 
-
 const config: Configuration = {
   projectToScope: {
     2449547: "Bonus Vacanze",

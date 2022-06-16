@@ -8,18 +8,20 @@ import { pipe } from "fp-ts/function";
 // https://github.com/danger/danger-js/blob/main/docs/usage/extending-danger.html.md#writing-your-plugin
 import { ap } from "fp-ts/lib/Identity";
 import { DangerDSLType } from "../node_modules/danger/distribution/dsl/DangerDSL";
+import { MarkdownString } from "../node_modules/danger/distribution/dsl/Aliases";
 import { getJiraIdFromPrTitle } from "./utils/titleParser";
 import { renderTickets } from "./dangerRender";
 import { getJiraIssues } from "./jira";
 import { fromJiraToGenericTicket, Configuration } from "./types";
 import { checkMinLength, matchRegex } from "./utils/validator";
-import { updatePrTitleAndLabel } from "./updatePr";
+import { updatePrLabel, updatePrTitle } from "./updatePr";
 
 const MIN_LEN_PR_DESCRIPTION = 10;
 
 declare const danger: DangerDSLType;
 declare function schedule<T>(asyncFunction: Promise<T>): void;
 declare function warn(message: string): void;
+declare function markdown(message: MarkdownString): void;
 
 // This is the main method called at the begin from Dangerfile.ts
 const customRules = async (configuration: Configuration): Promise<void> => {
@@ -34,14 +36,27 @@ const customRules = async (configuration: Configuration): Promise<void> => {
     ),
     TE.chain(getJiraIssues),
     TE.map(RA.map(fromJiraToGenericTicket)),
-    TE.bimap(
-      (err) => warn(err.message),
-      (tickets) => {
-        renderTickets(tickets);
-        updatePrTitleAndLabel(tickets)(configuration);
-      }
-    )
+    TE.map((tickets) => {
+      const ticketRender = pipe(
+        tickets,
+        renderTickets,
+        TE.fromEither,
+        TE.bimap(
+          (err) => warn(err.message),
+          (message) => markdown(message)
+        )
+      );
+
+      const labelRender = updatePrLabel(tickets)(configuration);
+
+      const titleRender = updatePrTitle(tickets)(configuration);
+
+      schedule(ticketRender());
+      schedule(labelRender());
+      schedule(titleRender());
+    })
   );
+
   schedule(addJiraTicket());
 
   pipe(

@@ -65,7 +65,7 @@ customRules(configuration);
 
 Look at the [Dangerfile.ts](https://github.com/pagopa/danger-plugin/blob/master/Dangerfile.ts) file to better understand how to structure it.
 
-### Creating a github bot account for Danger 
+### Creating a github bot account for Danger
 
 In order to get the most out of Danger, we recommend giving it the ability to post comments in your Pull Requests. This is a regular GitHub account, but depending on whether you are working on a private or public project, you will want to give different levels of access to this bot.
 
