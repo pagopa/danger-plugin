@@ -2,9 +2,11 @@ import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
+import * as S from "fp-ts/string";
 import * as RA from "fp-ts/ReadonlyArray";
 import { pipe } from "fp-ts/function";
 import { ap } from "fp-ts/lib/Identity";
+import { concatAll } from "fp-ts/Monoid";
 import { DangerDSLType } from "../node_modules/danger/distribution/dsl/DangerDSL";
 import { MarkdownString } from "../node_modules/danger/distribution/dsl/Aliases";
 import { getGenericTicketFromTitle } from "./utils/titleParser";
@@ -51,11 +53,7 @@ const customRules = async (configuration: Configuration): Promise<void> => {
             tbr.left,
             RA.map((error) => pipe(error.message, warn))
           );
-          pipe(
-            tbr.right,
-            RA.reduce("", (ac, str) => ac + str),
-            markdown
-          );
+          pipe(tbr.right, concatAll(S.Monoid), markdown);
         }
       )
     )()
