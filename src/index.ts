@@ -1,23 +1,20 @@
+import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
 import { pipe } from "fp-ts/function";
-
-// Provides dev-time typing structure for  `danger` - doesn't affect runtime.
-// https://github.com/danger/danger-js/blob/main/docs/usage/extending-danger.html.md#writing-your-plugin
 import { ap } from "fp-ts/lib/Identity";
 import { DangerDSLType } from "../node_modules/danger/distribution/dsl/DangerDSL";
 import { MarkdownString } from "../node_modules/danger/distribution/dsl/Aliases";
-import { getJiraIdFromPrTitle } from "./utils/titleParser";
+import { getGenericTicketFromTitle } from "./utils/titleParser";
 import { renderTickets } from "./dangerRender";
-import { getJiraIssues } from "./jira";
-import { fromJiraToGenericTicket, Configuration } from "./types";
+import { Configuration } from "./types";
 import { checkMinLength, matchRegex } from "./utils/validator";
 import { updatePrLabel, updatePrTitle } from "./updatePr";
 
-const MIN_LEN_PR_DESCRIPTION = 10;
-
+// Provides dev-time typing structure for  `danger` - doesn't affect runtime.
+// https://github.com/danger/danger-js/blob/main/docs/usage/extending-danger.html.md#writing-your-plugin
 declare const danger: DangerDSLType;
 declare function schedule<T>(asyncFunction: Promise<T>): void;
 declare function warn(message: string): void;
@@ -25,42 +22,47 @@ declare function markdown(message: MarkdownString): void;
 
 // This is the main method called at the begin from Dangerfile.ts
 const customRules = async (configuration: Configuration): Promise<void> => {
-  const addJiraTicket = pipe(
+  const renderOnGithub = pipe(
     danger.github.pr.title,
-    getJiraIdFromPrTitle,
-    TE.fromOption(
-      () =>
-        new Error(
-          "Jira ID not found in PR title. Please use the format [<project_id>-<sequence>]"
-        )
-    ),
-    TE.chain(getJiraIssues),
-    TE.map(RA.map(fromJiraToGenericTicket)),
-    TE.map((tickets) => {
-      const ticketRender = pipe(
-        tickets,
-        renderTickets,
-        TE.fromEither,
-        TE.bimap(
-          (err) => warn(err.message),
-          (message) => markdown(message)
-        )
-      );
-
+    getGenericTicketFromTitle,
+    TE.chain((tickets) => {
+      const ticketRender = pipe(tickets, renderTickets, TE.fromEither);
       const labelRender = updatePrLabel(tickets)(configuration);
-
       const titleRender = updatePrTitle(tickets)(configuration);
 
-      schedule(ticketRender());
-      schedule(labelRender());
-      schedule(titleRender());
+      return pipe(
+        [ticketRender, labelRender, titleRender],
+        RA.fromArray,
+        RA.sequence(T.ApplicativeSeq),
+        TE.fromTask,
+        TE.mapLeft(() => new Error("Error while updating github")),
+        TE.map((e) => pipe(e, RA.separate))
+      );
     })
   );
 
-  schedule(addJiraTicket());
+  schedule(
+    pipe(
+      renderOnGithub,
+      TE.bimap(
+        (error) => pipe(error.message, warn),
+        (tbr) => {
+          pipe(
+            tbr.left,
+            RA.map((error) => pipe(error.message, warn))
+          );
+          pipe(
+            tbr.right,
+            RA.reduce("", (ac, str) => ac + str),
+            markdown
+          );
+        }
+      )
+    )()
+  );
 
   pipe(
-    checkMinLength(danger.github.pr.body, MIN_LEN_PR_DESCRIPTION),
+    checkMinLength(danger.github.pr.body, configuration.minLenPrDescription),
     E.mapLeft(() =>
       warn("Please include a longer description in the Pull Request.")
     )

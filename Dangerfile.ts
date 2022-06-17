@@ -33,6 +33,7 @@ const config: Configuration = {
     fims: "Federated Identity Management System",
     myportal: "My Portal",
   },
+  minLenPrDescription: 10,
   updateLabel: true, //to add a label to the PR containing the name of the project linked to the ticket on Jira
   updateTitle: false, //to change the title of the PR according to whether the ticket on Jira is a feat / fix / chore / epic
 };

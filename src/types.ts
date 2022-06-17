@@ -12,6 +12,7 @@ export type Scope = string;
 export interface Configuration {
   readonly tagToScope: Record<string, Scope>;
   readonly projectToScope: Record<string, Scope>;
+  readonly minLenPrDescription: number;
   readonly updateLabel: boolean;
   readonly updateTitle: boolean;
 }

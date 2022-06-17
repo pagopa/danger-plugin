@@ -53,6 +53,9 @@ const configuration: Configuration = {
     services: "Services",
   },
 
+  //minimum length of the PR description below which a warning is generated
+  minLenPrDescription: 10,
+
   //To add a label to the PR containing the name of the project linked to the task on Jira.
   updateLabel: true,
 
