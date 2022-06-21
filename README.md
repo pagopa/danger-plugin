@@ -53,13 +53,13 @@ const configuration: Configuration = {
     services: "Services",
   },
 
-  //minimum length of the PR description below which a warning is generated
+  // minimum length of the PR description below which a warning is generated
   minLenPrDescription: 10,
 
-  //To add a label to the PR containing the name of the project linked to the task on Jira.
+  // To add a label to the PR containing the name of the project linked to the task on Jira.
   updateLabel: true,
 
-  //To change the title of the PR according to whether the task on Jira is a feat (Story) / fix (Bug) / chore (Sub-task) / epic.
+  // To change the title of the PR according to whether the task on Jira is a feat (Story) / fix (Bug) / chore (Sub-task) / epic.
   updateTitle: false,
 };
 
