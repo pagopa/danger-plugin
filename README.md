@@ -32,14 +32,14 @@ yarn add @pagopa/danger-plugin --dev
 
 ### At a glance
 
-Create a new file `Dangerfile.ts` in your root working dir. It is **mandatory** to define a `RecordScope` that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it.
+Create a new file `Dangerfile.ts` in your root working dir. It is **mandatory** to define a `Configuration` that allows you to make a mapping between a ticket projectid or ticket tag with a scope that is mainly a string that allows you to better describe it.
 
 ```js
 // Dangerfile.ts
 import customRules from "@pagopa/danger-plugin";
-import { RecordScope } from "@pagopa/danger-plugin/dist/types";
+import { Configuration } from "@pagopa/danger-plugin/dist/types";
 
-const recordScope: RecordScope = {
+const configuration: Configuration = {
   projectToScope: {
     IAC: "Bonus Pagamenti Digitali",
     IOACGN: "Carta Giovani Nazionale",
@@ -52,14 +52,23 @@ const recordScope: RecordScope = {
     payments: "Payments",
     services: "Services",
   },
+
+  // minimum length of the PR description below which a warning is generated
+  minLenPrDescription: 10,
+
+  // To add a label to the PR containing the name of the project linked to the task on Jira.
+  updateLabel: true,
+
+  // To change the title of the PR according to whether the task on Jira is a feat (Story) / fix (Bug) / chore (Sub-task) / epic.
+  updateTitle: false,
 };
 
-customRules(recordScope);
+customRules(configuration);
 ```
 
 Look at the [Dangerfile.ts](https://github.com/pagopa/danger-plugin/blob/master/Dangerfile.ts) file to better understand how to structure it.
 
-### Creating a bot account for Danger to use
+### Creating a GitHub bot account for Danger
 
 In order to get the most out of Danger, we recommend giving it the ability to post comments in your Pull Requests. This is a regular GitHub account, but depending on whether you are working on a private or public project, you will want to give different levels of access to this bot.
 
