@@ -36,7 +36,7 @@ export const getGenericTicketFromTitle = (
     TE.fromOption(
       () =>
         new Error(
-          "Jira ID not found in PR title. Please use the format [<project_id>-<sequence>]"
+          "Jira ID not found in PR title. Please use the format [jira_id]"
         )
     ),
     TE.chain(getJiraIssues),
