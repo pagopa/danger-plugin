@@ -12,7 +12,7 @@ import { fromJiraToGenericTicket, GenericTicket } from "../types";
 import { getJiraIssues } from "../jira";
 import { popFromRegex } from "./validator";
 
-const jiraRegex = /\[([A-Z0-9]+-\d+(,[A-Z0-9]+-\d+)*)]\s.+/;
+const jiraRegex = /\[([A-Z0-9]+-\d+(,[A-Z0-9]+-\d+)*)]/;
 const titleSplitter = new RegExp(/(\[.*]\s*)(.+)/g);
 const cleanChangelogRegex =
   /^(fix(\(.+\))?!?: |feat(\(.+\))?!?: |chore(\(.+\))?!?: )?(.*)$/;
@@ -36,7 +36,7 @@ export const getGenericTicketFromTitle = (
     TE.fromOption(
       () =>
         new Error(
-          "Jira ID not found in PR title. Please use the format [jira_id]"
+          "Jira ID not found in PR title. Please use the format [JIRA-ID]"
         )
     ),
     TE.chain(getJiraIssues),
