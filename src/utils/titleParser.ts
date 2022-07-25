@@ -12,7 +12,7 @@ import { fromJiraToGenericTicket, GenericTicket } from "../types";
 import { getJiraIssues } from "../jira";
 import { popFromRegex } from "./validator";
 
-const jiraRegex = /\[([A-Z0-9]+-\d+(,[A-Z0-9]+-\d+)*)]\s.+/;
+const jiraRegex = /\[([A-Z0-9]+-\d+(,[A-Z0-9]+-\d+)*)]/;
 const titleSplitter = new RegExp(/(\[.*]\s*)(.+)/g);
 const cleanChangelogRegex =
   /^(fix(\(.+\))?!?: |feat(\(.+\))?!?: |chore(\(.+\))?!?: )?(.*)$/;
